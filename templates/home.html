@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentinel Health - Home</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: linear-gradient(135deg, #eef2ff, #ffffff);
+            overflow-x: hidden;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            display: flex;
+            align-items: center;
+            padding: 12px 40px;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            height: 70px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo img {
+            height: 55px;
+        }
+
+        .logo span {
+            font-size: 28px;
+            font-weight: 700;
+            color: #4b2ce0;
+        }
+
+        /* HERO SECTION */
+        .hero {
+            height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 40px 80px;
+        }
+
+        .hero-left {
+            width: 50%;
+            animation: fadeIn 1.5s ease;
+        }
+
+        .hero-left h1 {
+            font-size: 58px;
+            font-weight: bold;
+            color: #1a1a1a;
+            margin-bottom: 15px;
+            line-height: 1.2;
+        }
+
+        .hero-left p {
+            font-size: 20px;
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 35px;
+            width: 85%;
+        }
+
+        .btn {
+            background: #4b2ce0;
+            color: white;
+            padding: 14px 32px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-size: 18px;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(75,44,224,0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            background: #3a1fb0;
+            transform: translateY(-3px);
+        }
+
+        .arrow {
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        /* CAROUSEL */
+        .hero-right {
+            width: 45%;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 340px;
+        }
+
+        .carousel-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            object-fit: cover;
+            position: absolute;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        .carousel-img.active {
+            opacity: 1;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        footer {
+            background: #111;
+            color: #ccc;
+            text-align: center;
+            padding: 20px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <div class="navbar">
+        <div class="logo">
+            <img src="/static/images/logo1.png" alt="Logo">
+            <span>Sentinel Health</span>
+        </div>
+    </div>
+
+    <!-- HERO SECTION -->
+    <div class="hero">
+
+        <!-- LEFT CONTENT -->
+        <div class="hero-left">
+            <h1>Your AI-Powered<br>Hospital Safety Partner</h1>
+            
+            <p>
+                Monitor patient safety, detect falls, analyze behaviors, and ensure a secure,
+                well-protected hospital environment using intelligent real-time AI automation.
+            </p>
+
+            <!-- FIXED: Correct login route -->
+            <a class="btn" href="{{ url_for('login_page') }}">
+                Get Started
+                <span class="arrow">➜</span>
+            </a>
+        </div>
+
+        <!-- RIGHT IMAGE CAROUSEL -->
+        <div class="hero-right">
+            <img class="carousel-img active" src="https://site-media.latticeworkinc.com/site/assets/files/1249/banner-senior-fall.1120x630.webp">
+            <img class="carousel-img" src="https://www.eurokidsindia.com/blog/wp-content/uploads/2023/06/reducing-aggressive-behavior-in-toddlers.jpg">
+            <img class="carousel-img" src="https://tse4.mm.bing.net/th/id/OIP._XIbdaNvB9CI4h9kwVWaugHaE8?pid=Api&P=0&h=180">
+            <img class="carousel-img" src="https://tse1.mm.bing.net/th/id/OIP.rfk-apOF0ckt47znu5aoUAHaE3?pid=Api&P=0&h=180">
+        </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        © 2025 Sentinel Health | AI-Powered Hospital Safety Monitoring System
+    </footer>
+
+    <!-- CAROUSEL SCRIPT -->
+    <script>
+        let images = document.querySelectorAll(".carousel-img");
+        let index = 0;
+
+        function changeImage() {
+            images[index].classList.remove("active");
+            index = (index + 1) % images.length;
+            images[index].classList.add("active");
+        }
+
+        setInterval(changeImage, 3000);
+    </script>
+
+</body>
+</html>

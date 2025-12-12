@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Live Monitor | Sentinel Health</title>
+    <style>
+      :root{
+        --bg:#f3f6fb;
+        --card:#ffffff;
+        --accent:#5a4fd6;
+        --muted:#7b8090;
+        --border:#e8ebf3;
+      }
+      * { box-sizing: border-box; margin:0; padding:0; }
+      html,body{height:100%;font-family:Inter, "Roboto", system-ui, "Segoe UI", Arial;background:var(--bg);color:#111}
+      a{color:inherit;text-decoration:none}
+
+      .sidebar { width: 260px; height: 100vh; background: var(--card); position: fixed; left: 0; top: 0; padding: 28px 18px; border-right: 1px solid #eceff6; display: flex; flex-direction: column; align-items: flex-start; gap: 18px; box-shadow: 3px 0 15px rgba(0,0,0,0.03); }
+      .logo-container { display:flex; align-items:center; gap:12px; width:100% }
+      .logo-container img{ width:44px; height:44px; border-radius:10px; object-fit:cover }
+      .logo-container h1{ font-size:18px; color:var(--accent); margin:0; font-weight:800 }
+
+      .nav-item { width:100%; padding:12px 16px; display:block; color:#333; font-size:15px; border-radius:12px; transition: all .16s ease; font-weight:700; background:transparent; cursor:pointer; text-align:center; }
+      .nav-item:hover { background: rgba(90,79,214,0.06); color:var(--accent); transform: translateY(-2px) }
+      .nav-item.active { background: linear-gradient(90deg, rgba(90,79,214,0.06), rgba(90,79,214,0.02)); color:var(--accent); box-shadow: 0 6px 18px rgba(75,44,224,0.04) }
+
+      .content { margin-left: 300px; padding: 40px; }
+      h1 { font-size:28px; margin-bottom:30px; }
+      .video-frame { background: #000; border-radius: 14px; overflow:hidden; box-shadow: 0 8px 30px rgba(21,24,40,0.04); margin-bottom:20px; }
+      .video-frame img { width:100%; height:auto; display:block; }
+      #stats { background: var(--card); padding: 20px; border-radius: 14px; box-shadow: 0 8px 30px rgba(21,24,40,0.04); border:1px solid var(--border); }
+      #stats p { font-size:18px; }
+      #fallCount { font-weight:800; color:var(--accent); font-size:24px; }
+    </style>
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="logo-container">
+        <img src="{{ url_for('static', filename='images/logo1.png') }}" alt="logo" />
+        <h1>Sentinel Health</h1>
+      </div>
+      <a class="nav-item" href="{{ url_for('about') }}">About</a>
+      <a class="nav-item" href="{{ url_for('upload_page') }}">Upload Video</a>
+      <a class="nav-item active" href="{{ url_for('live') }}">Live Monitor</a>
+      <a class="nav-item" href="{{ url_for('analytics') }}">Analytics</a>
+      <a class="nav-item" href="{{ url_for('admin_panel') }}">Admin Panel</a>
+      <a class="nav-item" href="{{ url_for('logout') }}">Logout</a>
+    </div>
+
+    <!-- Main Content -->
+    <main class="content">
+      <h1>Live Video Feed</h1>
+      <div class="video-frame">
+        <img src="{{ url_for('stream_live') }}" alt="Live feed" />
+      </div>
+      <div id="stats">
+        <p>Fall events detected: <span id="fallCount">0</span></p>
+      </div>
+    </main>
+
+    <script>
+      async function updateStats(){
+        try{
+          const r = await fetch('{{ url_for("api_analytics") }}');
+          const j = await r.json();
+          document.getElementById('fallCount').innerText = j.fall_count || 0;
+        }catch(e){console.warn(e)}
+      }
+      setInterval(updateStats, 2000);
+      updateStats();
+    </script>
+  </body>
+</html>

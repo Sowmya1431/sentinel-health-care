@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel | Sentinel Health</title>
+
+<style>
+    :root{
+      --bg:#f3f6fb;
+      --card:#ffffff;
+      --accent:#5a4fd6;
+      --muted:#7b8090;
+      --border:#e8ebf3;
+    }
+    * { box-sizing: border-box; }
+    html,body{height:100%;margin:0;font-family:Inter, "Roboto", system-ui, "Segoe UI", Arial;background:var(--bg);color:#111}
+    a{color:inherit;text-decoration:none}
+
+    /* Sidebar */
+    .sidebar { width: 260px; height: 100vh; background: var(--card); position: fixed; left: 0; top: 0; padding: 28px 18px; border-right: 1px solid #eceff6; display: flex; flex-direction: column; align-items: flex-start; gap: 18px; box-shadow: 3px 0 15px rgba(0,0,0,0.03); }
+    .logo-container { display:flex; align-items:center; gap:12px; width:100% }
+    .logo-container img{ width:44px; height:44px; border-radius:10px; object-fit:cover }
+    .logo-container h1{ font-size:18px; color:var(--accent); margin:0; font-weight:800 }
+
+    .nav-list { width:100%; margin-top:8px; display:flex; flex-direction:column; gap:8px; }
+    .nav-item { width:100%; padding:12px 16px; display:block; color:#333; font-size:15px; border-radius:12px; transition: all .16s ease; font-weight:700; background:transparent; cursor:pointer; text-align:center; }
+    .nav-item:hover { background: rgba(90,79,214,0.06); color:var(--accent); transform: translateY(-2px) }
+    .nav-item.active { background: linear-gradient(90deg, rgba(90,79,214,0.06), rgba(90,79,214,0.02)); color:var(--accent); box-shadow: 0 6px 18px rgba(75,44,224,0.04) }
+
+    /* Main content */
+    .content {
+        margin-left: 300px;
+        padding: 40px;
+    }
+
+    .title {
+        font-size: 30px;
+        font-weight: bold;
+        margin-bottom: 25px;
+    }
+
+    .add-btn {
+        background: #4b2ce0;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        float: right;
+        margin-bottom: 15px;
+    }
+
+    table {
+        width: 100%;
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        border-collapse: collapse;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    th, td {
+        padding: 14px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+    }
+
+    th {
+        font-weight: bold;
+    }
+
+    .edit-btn, .delete-btn {
+        padding: 8px 14px;
+        border-radius: 6px;
+        cursor: pointer;
+        border: none;
+    }
+
+    .edit-btn {
+        background: #4b2ce0;
+        color: white;
+    }
+
+    .delete-btn {
+        background: #d9534f;
+        color: white;
+    }
+
+    /* Modal styles */
+    .modal-bg {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        background: rgba(0,0,0,0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-box {
+        background: white;
+        padding: 25px;
+        width: 420px;
+        border-radius: 12px;
+    }
+
+    .modal-title {
+        font-size: 22px;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+
+    .input-box {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 15px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+    }
+
+    .modal-btns {
+        text-align: right;
+        margin-top: 15px;
+    }
+
+    .cancel-btn {
+        padding: 10px 18px;
+        border: none;
+        background: #ccc;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    .save-btn {
+        padding: 10px 18px;
+        border: none;
+        background: #4b2ce0;
+        color: white;
+        border-radius: 6px;
+        cursor: pointer;
+        margin-left: 10px;
+    }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar" role="navigation" aria-label="Main navigation">
+    <div class="logo-container">
+        <img src="/static/images/logo1.png" alt="logo" />
+        <h1>Sentinel Health</h1>
+    </div>
+
+    <div class="nav-list" role="menu" aria-label="Sidebar links">
+        <a class="nav-item" href="{{ url_for('about') }}">About</a>
+        <a class="nav-item" href="{{ url_for('upload_page') }}">Upload Video</a>
+        <a class="nav-item active" href="{{ url_for('admin_panel') }}">Admin Panel</a>
+        <a class="nav-item" href="{{ url_for('logout') }}">Logout</a>
+
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="content">
+    <h2 class="title">Admin Panel</h2>
+
+    <button class="add-btn" onclick="openAddModal()">+ Add New User</button>
+    <button style="margin-left:12px;padding:10px 14px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer" onclick="loadUsers()" id="refreshBtn">Refresh</button>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Staff Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody id="usersBody">
+            <!-- existing static rows replaced by JS -->
+            <tr><td colspan="4" style="color:#777;padding:18px;text-align:center">Loading users...</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Add User Modal -->
+<div id="addModal" class="modal-bg">
+    <div class="modal-box">
+        <div class="modal-title">Add User</div>
+        <form id="addUserForm" onsubmit="addUser(event)">
+            <input id="add_username" name="username" class="input-box" placeholder="Full Name" required>
+            <input id="add_email" name="email" type="email" class="input-box" placeholder="Email" required>
+            <input id="add_password" name="password" type="password" class="input-box" placeholder="Password" required>
+            <select id="add_role" name="role" class="input-box" required>
+                <option value="">Select Role</option>
+                <option value="Doctor">Doctor</option>
+                <option value="Nurse">Nurse</option>
+            </select>
+            <input id="add_hospital_id" name="hospital_id" class="input-box" placeholder="Hospital ID" required>
+            <div class="modal-btns">
+                <button type="button" class="cancel-btn" onclick="closeAddModal()">Cancel</button>
+                <button type="submit" class="save-btn">Add User</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit User Modal -->
+<div id="editModal" class="modal-bg">
+    <div class="modal-box">
+        <div class="modal-title">Edit User Details</div>
+        <form id="editUserForm" onsubmit="updateUser(event)">
+            <input id="edit_name" name="username" class="input-box" placeholder="Full Name" required>
+            <input id="edit_email" name="email" type="email" class="input-box" placeholder="Email" required>
+            <select id="edit_role" name="role" class="input-box" required>
+                <option value="">Select Role</option>
+                <option value="Doctor">Doctor</option>
+                <option value="Nurse">Nurse</option>
+            </select>
+            <input id="edit_id" name="user_id" class="input-box" readonly style="display:none">
+            <div class="modal-btns">
+                <button type="button" class="cancel-btn" onclick="closeEditModal()">Cancel</button>
+                <button type="submit" class="save-btn">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openAddModal() {
+        document.getElementById("addModal").style.display = "flex";
+    }
+    function closeAddModal() {
+        document.getElementById("addModal").style.display = "none";
+    }
+
+    function openEditModal(name, email, role, id) {
+        document.getElementById("edit_name").value = name;
+        document.getElementById("edit_email").value = email;
+        document.getElementById("edit_role").value = role;
+        document.getElementById("edit_id").value = id;
+        document.getElementById("editModal").style.display = "flex";
+    }
+    function closeEditModal() {
+        document.getElementById("editModal").style.display = "none";
+    }
+
+    async function loadUsers() {
+        const body = document.getElementById('usersBody');
+        const refreshBtn = document.getElementById('refreshBtn');
+        refreshBtn.disabled = true;
+        body.innerHTML = '<tr><td colspan="5" style="color:#777;padding:18px;text-align:center">Loading users...</td></tr>';
+        try {
+            const res = await fetch('{{ url_for("api_users") }}', { credentials: 'same-origin' });
+            if (!res.ok) {
+                if (res.status === 403) {
+                    body.innerHTML = '<tr><td colspan="4" style="color:#b00020;padding:18px;text-align:center">Forbidden — you do not have access.</td></tr>';
+                } else {
+                    body.innerHTML = `<tr><td colspan="4" style="color:#b00020;padding:18px;text-align:center">Failed to load users (status ${res.status})</td></tr>`;
+                }
+                return;
+            }
+            const j = await res.json();
+            if (!j.success) {
+                body.innerHTML = `<tr><td colspan="4" style="color:#b00020;padding:18px;text-align:center">${j.message || 'Failed to load users'}</td></tr>`;
+                return;
+            }
+            const users = j.users || [];
+            if (users.length === 0) {
+                body.innerHTML = '<tr><td colspan="4" style="color:#777;padding:18px;text-align:center">No users found.</td></tr>';
+                return;
+            }
+            body.innerHTML = '';
+            for (const u of users) {
+                const tr = document.createElement('tr');
+                const id = u._id || '';
+                tr.innerHTML = `
+                    <td>${escapeHtml(u.username || '')}</td>
+                    <td>${escapeHtml(u.email || '')}</td>
+                    <td>${escapeHtml(u.role || '')}</td>
+                    <td>
+                      <button class="edit-btn" onclick="openEditModal('${escapeJs(u.username||'')}','${escapeJs(u.email||'')}','${escapeJs(u.role||'')}','${escapeJs(id)}')">Edit</button>
+                      <button class="delete-btn" onclick="deleteUser('${escapeJs(id)}')">Delete</button>
+                    </td>`;
+                body.appendChild(tr);
+            }
+        } catch (err) {
+            console.error('loadUsers error', err);
+            body.innerHTML = '<tr><td colspan="4" style="color:#b00020;padding:18px;text-align:center">Error loading users.</td></tr>';
+        } finally {
+            refreshBtn.disabled = false;
+        }
+    }
+
+    // basic helpers to avoid injection in generated HTML
+    function escapeHtml(s){ return String(s).replace(/[&<>"']/g, function(m){ return ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[m]); }); }
+    function escapeJs(s){ return String(s).replace(/['\\]/g, function(m){ return {'\\':'\\\\', "'":"\\'"}[m]; }); }
+
+    // Add new user
+    async function addUser(event) {
+        event.preventDefault();
+        const form = document.getElementById('addUserForm');
+        const formData = new FormData(form);
+        const data = {
+            username: formData.get('username'),
+            email: formData.get('email'),
+            password: formData.get('password'),
+            role: formData.get('role'),
+            hospital_id: formData.get('hospital_id')
+        };
+
+        try {
+            const res = await fetch('{{ url_for("api_add_user") }}', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                credentials: 'same-origin',
+                body: JSON.stringify(data)
+            });
+            const j = await res.json();
+            if (res.ok && j.success) {
+                alert('User added successfully!');
+                closeAddModal();
+                form.reset();
+                loadUsers();
+            } else {
+                alert(j.message || 'Failed to add user');
+            }
+        } catch (err) {
+            console.error('addUser error', err);
+            alert('Error adding user. See console.');
+        }
+    }
+
+    // Update user
+    async function updateUser(event) {
+        event.preventDefault();
+        const form = document.getElementById('editUserForm');
+        const formData = new FormData(form);
+        const userId = formData.get('user_id');
+        const data = {
+            username: formData.get('username'),
+            email: formData.get('email'),
+            role: formData.get('role')
+        };
+
+        try {
+            const res = await fetch('{{ url_for("api_update_user") }}', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                credentials: 'same-origin',
+                body: JSON.stringify({user_id: userId, ...data})
+            });
+            const j = await res.json();
+            if (res.ok && j.success) {
+                alert('User updated successfully!');
+                closeEditModal();
+                loadUsers();
+            } else {
+                alert(j.message || 'Failed to update user');
+            }
+        } catch (err) {
+            console.error('updateUser error', err);
+            alert('Error updating user. See console.');
+        }
+    }
+
+    // Delete user
+    async function deleteUser(id) {
+        if (!confirm('Are you sure you want to delete this user?')) return;
+        
+        try {
+            const res = await fetch('{{ url_for("api_delete_user") }}', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                credentials: 'same-origin',
+                body: JSON.stringify({user_id: id})
+            });
+            const j = await res.json();
+            if (res.ok && j.success) {
+                alert('User deleted successfully!');
+                loadUsers();
+            } else {
+                alert(j.message || 'Failed to delete user');
+            }
+        } catch (err) {
+            console.error('deleteUser error', err);
+            alert('Error deleting user. See console.');
+        }
+    }
+
+    // load users on page ready
+    document.addEventListener('DOMContentLoaded', loadUsers);
+</script>
+
+</body>
+</html>
