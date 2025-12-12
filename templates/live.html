@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Live Monitor - Fall Detection</title>
+    <link rel="stylesheet" href="/static/css/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <aside class="sidebar">
+        <a href="/upload">Video Upload</a>
+        <a href="/live">Live Monitor</a>
+        <a href="/analytics">Analytics</a>
+      </aside>
+      <main class="content">
+        <h1>Live Video Feed</h1>
+        <div class="video-frame">
+          <img src="/stream_live" alt="Live feed" />
+        </div>
+        <div id="stats">
+          <p>Fall events detected: <span id="fallCount">0</span></p>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      async function updateStats(){
+        try{
+          const r = await fetch('/api/analytics');
+          const j = await r.json();
+          document.getElementById('fallCount').innerText = j.fall_count || 0;
+        }catch(e){console.warn(e)}
+      }
+      setInterval(updateStats, 2000);
+      updateStats();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel | Sentinel Health</title>
+
+<style>
+    body {
+        margin: 0;
+        font-family: 'Roboto', sans-serif;
+        background: #f7f8fc;
+    }
+
+    /* Sidebar */
+    .sidebar {
+        width: 270px;
+        height: 100vh;
+        background: white;
+        position: fixed;
+        left: 0;
+        top: 0;
+        padding: 30px 0;
+        border-right: 1px solid #e5e5e5;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        box-shadow: 3px 0 15px rgba(0,0,0,0.05);
+    }
+
+    .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 40px;
+    }
+
+    .logo-container img {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+    }
+
+    .logo-container h1 {
+        font-size: 22px;
+        color: #4b2ce0;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .nav-item {
+        width: 90%;
+        padding: 15px 20px;
+        display: block;
+        color: #333;
+        text-decoration: none;
+        font-size: 16px;
+        margin-bottom: 12px;
+        border-radius: 12px;
+        text-align: center;
+        transition: 0.3s ease;
+        cursor: pointer;
+    }
+
+    .nav-item:hover, .active {
+        background: rgba(75,44,224,0.1);
+        color: #4b2ce0;
+        transform: scale(0.91);
+        box-shadow: 0 4px 12px rgba(75,44,224,0.2);
+    }
+
+    /* Main content */
+    .content {
+        margin-left: 290px;
+        padding: 40px;
+    }
+
+    .title {
+        font-size: 30px;
+        font-weight: bold;
+        margin-bottom: 25px;
+    }
+
+    .add-btn {
+        background: #4b2ce0;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        float: right;
+        margin-bottom: 15px;
+    }
+
+    table {
+        width: 100%;
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        border-collapse: collapse;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    th, td {
+        padding: 14px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+    }
+
+    th {
+        font-weight: bold;
+    }
+
+    .edit-btn, .delete-btn {
+        padding: 8px 14px;
+        border-radius: 6px;
+        cursor: pointer;
+        border: none;
+    }
+
+    .edit-btn {
+        background: #4b2ce0;
+        color: white;
+    }
+
+    .delete-btn {
+        background: #d9534f;
+        color: white;
+    }
+
+    /* Modal styles */
+    .modal-bg {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        background: rgba(0,0,0,0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-box {
+        background: white;
+        padding: 25px;
+        width: 420px;
+        border-radius: 12px;
+    }
+
+    .modal-title {
+        font-size: 22px;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+
+    .input-box {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 15px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+    }
+
+    .modal-btns {
+        text-align: right;
+        margin-top: 15px;
+    }
+
+    .cancel-btn {
+        padding: 10px 18px;
+        border: none;
+        background: #ccc;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    .save-btn {
+        padding: 10px 18px;
+        border: none;
+        background: #4b2ce0;
+        color: white;
+        border-radius: 6px;
+        cursor: pointer;
+        margin-left: 10px;
+    }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+    <div class="logo-container">
+        <img src="/static/images/logo1.png" alt="logo">
+        <h1>Sentinel Health</h1>
+    </div>
+
+    <div class="nav-item">About</div>
+    <div class="nav-item">Upload Video</div>
+    <div class="nav-item">Analytics</div>
+    <a class="nav-item active" href="file:///C:/Users/lenovo/Downloads/sruthika1/sruthika/Fall-Detection/Backend/templates/admin_panel.html">Admin Panel</a>
+    <div class="nav-item">Logout</div>
+</div>
+
+<!-- Main Content -->
+<div class="content">
+    <h2 class="title">Admin Panel</h2>
+
+    <button class="add-btn" onclick="openAddModal()">+ Add New User</button>
+    <button style="margin-left:12px;padding:10px 14px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer" onclick="loadUsers()" id="refreshBtn">Refresh</button>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Staff Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Staff ID</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody id="usersBody">
+            <!-- existing static rows replaced by JS -->
+            <tr><td colspan="5" style="color:#777;padding:18px;text-align:center">Loading users...</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Add User Modal -->
+<div id="addModal" class="modal-bg">
+    <div class="modal-box">
+        <div class="modal-title">Add User</div>
+        <form>
+            <input class="input-box" placeholder="Full Name" required>
+            <input class="input-box" placeholder="Email" required>
+            <select class="input-box">
+                <option>Doctor</option>
+                <option>Nurse</option>
+                <option>Staff</option>
+            </select>
+            <input class="input-box" placeholder="Staff ID" required>
+            <div class="modal-btns">
+                <button type="button" class="cancel-btn" onclick="closeAddModal()">Cancel</button>
+                <button type="submit" class="save-btn">Add User</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit User Modal -->
+<div id="editModal" class="modal-bg">
+    <div class="modal-box">
+        <div class="modal-title">Edit User Details</div>
+        <form>
+            <input id="edit_name" class="input-box">
+            <input id="edit_email" class="input-box">
+            <select id="edit_role" class="input-box">
+                <option>Doctor</option>
+                <option>Nurse</option>
+                <option>Staff</option>
+            </select>
+            <input id="edit_id" class="input-box" readonly>
+            <div class="modal-btns">
+                <button type="button" class="cancel-btn" onclick="closeEditModal()">Cancel</button>
+                <button type="submit" class="save-btn">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openAddModal() {
+        document.getElementById("addModal").style.display = "flex";
+    }
+    function closeAddModal() {
+        document.getElementById("addModal").style.display = "none";
+    }
+
+    function openEditModal(name, email, role, id) {
+        document.getElementById("edit_name").value = name;
+        document.getElementById("edit_email").value = email;
+        document.getElementById("edit_role").value = role;
+        document.getElementById("edit_id").value = id;
+        document.getElementById("editModal").style.display = "flex";
+    }
+    function closeEditModal() {
+        document.getElementById("editModal").style.display = "none";
+    }
+
+    async function loadUsers() {
+        const body = document.getElementById('usersBody');
+        const refreshBtn = document.getElementById('refreshBtn');
+        refreshBtn.disabled = true;
+        body.innerHTML = '<tr><td colspan="5" style="color:#777;padding:18px;text-align:center">Loading users...</td></tr>';
+        try {
+            const res = await fetch('{{ url_for("api_users") }}', { credentials: 'same-origin' });
+            if (!res.ok) {
+                if (res.status === 403) {
+                    body.innerHTML = '<tr><td colspan="5" style="color:#b00020;padding:18px;text-align:center">Forbidden — you do not have access.</td></tr>';
+                } else {
+                    body.innerHTML = `<tr><td colspan="5" style="color:#b00020;padding:18px;text-align:center">Failed to load users (status ${res.status})</td></tr>`;
+                }
+                return;
+            }
+            const j = await res.json();
+            if (!j.success) {
+                body.innerHTML = `<tr><td colspan="5" style="color:#b00020;padding:18px;text-align:center">${j.message || 'Failed to load users'}</td></tr>`;
+                return;
+            }
+            const users = j.users || [];
+            if (users.length === 0) {
+                body.innerHTML = '<tr><td colspan="5" style="color:#777;padding:18px;text-align:center">No users found.</td></tr>';
+                return;
+            }
+            body.innerHTML = '';
+            for (const u of users) {
+                const tr = document.createElement('tr');
+                const id = u._id || '';
+                tr.innerHTML = `
+                    <td>${escapeHtml(u.username || '')}</td>
+                    <td>${escapeHtml(u.email || '')}</td>
+                    <td>${escapeHtml(u.role || '')}</td>
+                    <td>${escapeHtml(id)}</td>
+                    <td>
+                      <button class="edit-btn" onclick="openEditModal('${escapeJs(u.username||'')}','${escapeJs(u.email||'')}','${escapeJs(u.role||'')}','${escapeJs(id)}')">Edit</button>
+                      <button class="delete-btn" onclick="deleteUser('${escapeJs(id)}')">Delete</button>
+                    </td>`;
+                body.appendChild(tr);
+            }
+        } catch (err) {
+            console.error('loadUsers error', err);
+            body.innerHTML = '<tr><td colspan="5" style="color:#b00020;padding:18px;text-align:center">Error loading users.</td></tr>';
+        } finally {
+            refreshBtn.disabled = false;
+        }
+    }
+
+    // basic helpers to avoid injection in generated HTML
+    function escapeHtml(s){ return String(s).replace(/[&<>"']/g, function(m){ return ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[m]); }); }
+    function escapeJs(s){ return String(s).replace(/['\\]/g, function(m){ return {'\\':'\\\\', "'":"\\'"}[m]; }); }
+
+    // placeholder delete (implement server-side delete endpoint as needed)
+    function deleteUser(id) {
+        if (!confirm('Delete user ' + id + '?')) return;
+        alert('Delete not implemented in this demo. ID: ' + id);
+    }
+
+    // load users on page ready
+    document.addEventListener('DOMContentLoaded', loadUsers);
+</script>
+
+</body>
+</html>

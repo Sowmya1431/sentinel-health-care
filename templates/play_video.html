@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Play Video - Fall Detection</title>
+    <link rel="stylesheet" href="/static/css/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <aside class="sidebar">
+        <a href="/upload">Video Upload</a>
+        <a href="/live">Live Monitor</a>
+        <a href="/analytics">Analytics</a>
+      </aside>
+      <main class="content">
+        <h1>Playing: {{ filename }}</h1>
+        <div class="video-frame">
+          <img src="{{ url_for('stream_video', filename=filename) }}" alt="Video stream" />
+        </div>
+        <p><a href="{{ url_for('uploaded_file', filename=filename) }}">Download original file</a></p>
+      </main>
+    </div>
+  </body>
+</html>
