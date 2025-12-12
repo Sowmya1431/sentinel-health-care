@@ -1,9 +1,0 @@
-body{font-family: Arial, Helvetica, sans-serif; margin:0; background:#f7f7f9}
-.container{display:flex; min-height:100vh}
-.sidebar{width:180px; background:#fff; border-right:1px solid #e6e6e6; padding:20px}
-.sidebar a{display:block; padding:8px 0; color:#333; text-decoration:none}
-.content{flex:1; padding:28px}
-.upload-box{border:2px dashed #ddd; padding:18px; background:#fff; margin-bottom:12px}
-.btn{background:#ff7f50; color:#fff; border:none; padding:10px 16px; cursor:pointer}
-.video-frame img{max-width:100%; border:1px solid #ddd}
-.card{background:#fff; padding:12px; margin:8px 0; border:1px solid #eee}
